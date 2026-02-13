@@ -1,11 +1,22 @@
 "use client";
 
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { ReactNode } from "react";
 
-export default function LibraryButton() {
+type LibraryButtonProps = {
+  children: ReactNode;
+  variant?: string;
+  onClick?: () => void;
+};
+
+export default function LibraryButton({
+  children,
+  variant,
+  onClick,
+}: LibraryButtonProps) {
   return (
-    <Button>
-      Add to Library
+    <Button onClick={onClick} className={variant === "add" ? "bg-green-600 text-white" : ""}>
+      {children}
     </Button>
   );
 }
