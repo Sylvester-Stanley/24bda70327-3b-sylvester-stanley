@@ -1,198 +1,162 @@
 "use client";
 
 import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import LibraryButton from "@/components/library-button";
 
-interface Item {
-  id: string;
-  name: string;
-  createdAt: string;
-}
+type Book = {
+  id: number;
+  title: string;
+  author: string;
+};
 
-export default function Home() {
-  const [items, setItems] = useState<Item[]>([]);
-  const [inputValue, setInputValue] = useState("");
-  const [showNotification, setShowNotification] = useState("");
+export default function Page() {
+  const [query, setQuery] = useState("");
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [books, setBooks] = useState<Book[]>([]);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editAuthor, setEditAuthor] = useState("");
 
-  // Handler for Add button
-  const handleAddClick = () => {
-    if (!inputValue.trim()) {
-      setShowNotification("Please enter an item name");
-      setTimeout(() => setShowNotification(""), 3000);
-      return;
-    }
+  const filteredBooks = books.filter(
+    (b) =>
+      b.title.toLowerCase().includes(query.toLowerCase()) ||
+      b.author.toLowerCase().includes(query.toLowerCase())
+  );
 
-    const newItem: Item = {
-      id: Date.now().toString(),
-      name: inputValue,
-      createdAt: new Date().toLocaleString(),
+  function handleAdd() {
+    if (!title.trim() || !author.trim()) return;
+
+    const newBook: Book = {
+      id: Date.now(),
+      title,
+      author,
     };
 
-    setItems([newItem, ...items]);
-    setInputValue("");
-    setShowNotification("✓ Item added successfully!");
-    setTimeout(() => setShowNotification(""), 3000);
+    setBooks([newBook, ...books]);
+    setTitle("");
+    setAuthor("");
+  }
 
-    console.log("Item added:", newItem);
-  };
+  function handleRemove(id: number) {
+    setBooks(books.filter((b) => b.id !== id));
+  }
 
-  // Handler for Delete button
-  const handleDeleteClick = () => {
-    if (items.length === 0) {
-      setShowNotification("No items to delete");
-      setTimeout(() => setShowNotification(""), 3000);
-      return;
-    }
+  function handleEdit(book: Book) {
+    setEditingId(book.id);
+    setEditTitle(book.title);
+    setEditAuthor(book.author);
+  }
 
-    const deletedItem = items[0];
-    setItems(items.slice(1));
-    setShowNotification(`✓ Deleted: ${deletedItem.name}`);
-    setTimeout(() => setShowNotification(""), 3000);
+  function handleSaveEdit(id: number) {
+    if (!editTitle.trim() || !editAuthor.trim()) return;
 
-    console.log("Item deleted:", deletedItem);
-  };
+    setBooks(
+      books.map((b) =>
+        b.id === id ? { ...b, title: editTitle, author: editAuthor } : b
+      )
+    );
 
-  // Handler for Delete All button
-  const handleDeleteAll = () => {
-    if (items.length === 0) {
-      setShowNotification("No items to delete");
-      setTimeout(() => setShowNotification(""), 3000);
-      return;
-    }
+    setEditingId(null);
+  }
 
-    const count = items.length;
-    setItems([]);
-    setShowNotification(`✓ Deleted all ${count} item(s)`);
-    setTimeout(() => setShowNotification(""), 3000);
-
-    console.log("All items deleted");
-  };
-
-  // Handler for Delete specific item
-  const handleDeleteItem = (id: string) => {
-    const itemToDelete = items.find((item) => item.id === id);
-    setItems(items.filter((item) => item.id !== id));
-    setShowNotification(`✓ Deleted: ${itemToDelete?.name}`);
-    setTimeout(() => setShowNotification(""), 3000);
-
-    console.log("Item deleted:", itemToDelete);
-  };
-
-  // Handler for input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-  };
-
-  // Handler for Enter key press
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleAddClick();
-    }
-  };
+  function handleCancelEdit() {
+    setEditingId(null);
+  }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-      <div className="max-w-3xl mx-auto">
-        {/* Header Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Welcome to My App
-          </h1>
-          <p className="text-lg text-gray-600">
-            A simple and elegant item management interface
-          </p>
-        </div>
+    <div className="max-w-2xl mx-auto py-10 space-y-6">
+      <h1 className="text-3xl font-bold text-center">
+        Library Management System
+      </h1>
 
-        {/* Notification Section */}
-        {showNotification && (
-          <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg animate-pulse">
-            {showNotification}
-          </div>
+      <Input
+        placeholder="Search by title or author"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+
+      <div className="flex gap-2">
+        <Input
+          placeholder="Book title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <Input
+          placeholder="Author"
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+        />
+        <LibraryButton variant="add" onClick={handleAdd}>
+          Add
+        </LibraryButton>
+      </div>
+
+      <div className="space-y-4">
+        {filteredBooks.length === 0 && (
+          <p className="text-center text-muted-foreground">
+            No books found
+          </p>
         )}
 
-        {/* Content Section */}
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-            Add Items
-          </h2>
+        {filteredBooks.map((book) => (
+          <Card key={book.id}>
+            <CardContent className="p-4 space-y-3">
+              {editingId === book.id ? (
+                <>
+                  <Input
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                  />
+                  <Input
+                    value={editAuthor}
+                    onChange={(e) => setEditAuthor(e.target.value)}
+                  />
 
-          {/* Input Section */}
-          <div className="flex gap-4 mb-8">
-            <input
-              type="text"
-              value={inputValue}
-              onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
-              placeholder="Enter item name..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <LibraryButton variant="add" onClick={handleAddClick}>
-              + Add
-            </LibraryButton>
-          </div>
+                  <div className="flex gap-2">
+                    <LibraryButton
+                      variant="add"
+                      onClick={() => handleSaveEdit(book.id)}
+                    >
+                      Save
+                    </LibraryButton>
+                    <LibraryButton
+                      variant="remove"
+                      onClick={handleCancelEdit}
+                    >
+                      Cancel
+                    </LibraryButton>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h2 className="font-semibold">{book.title}</h2>
+                  <p className="text-muted-foreground">{book.author}</p>
 
-          {/* Action Buttons */}
-          <div className="flex gap-4 mb-8 flex-wrap">
-            <LibraryButton onClick={handleDeleteClick}>
-              Delete First
-            </LibraryButton>
-            <LibraryButton onClick={handleDeleteAll}>
-              Delete All
-            </LibraryButton>
-          </div>
+                  <div className="flex gap-2">
+                    <LibraryButton
+                      variant="edit"
+                      onClick={() => handleEdit(book)}
+                    >
+                      Edit
+                    </LibraryButton>
 
-          {/* Items List Section */}
-          <div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">
-              Items ({items.length})
-            </h3>
-            {items.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <p>No items yet. Add one to get started!</p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition"
-                  >
-                    <div>
-                      <p className="font-medium text-gray-800">{item.name}</p>
-                      <p className="text-sm text-gray-500">{item.createdAt}</p>
-                    </div>
-                    <button
-                      onClick={() => handleDeleteItem(item.id)}
-                      className="px-3 py-1 text-red-600 hover:bg-red-50 rounded transition"
+                    <LibraryButton
+                      variant="remove"
+                      onClick={() => handleRemove(book.id)}
                     >
                       Remove
-                    </button>
+                    </LibraryButton>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Stats Section */}
-        <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className="bg-white rounded-lg shadow p-6 text-center">
-            <p className="text-gray-600 mb-2">Total Items</p>
-            <p className="text-3xl font-bold text-blue-600">{items.length}</p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6 text-center">
-            <p className="text-gray-600 mb-2">Status</p>
-            <p className="text-xl font-semibold text-green-600">
-              {items.length > 0 ? "Active" : "Empty"}
-            </p>
-          </div>
-        </div>
-
-        {/* Footer Section */}
-        <div className="text-center text-gray-500 text-sm">
-          <p>© 2026 My App. All rights reserved.</p>
-        </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        ))}
       </div>
-    </main>
+    </div>
   );
 }
+
