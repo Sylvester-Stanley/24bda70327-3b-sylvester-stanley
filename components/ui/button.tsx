@@ -1,31 +1,30 @@
-import { cn } from "@/lib/utils"
+"use client";
+
+import React, { ReactNode } from "react";
 
 type LibraryButtonProps = {
-  onClick: () => void
-  variant: "add" | "remove" | "edit"
-  children: React.ReactNode
-}
+  children: ReactNode;
+  variant?: string;
+  onClick?: () => void;
+  className?: string;
+};
 
-export default function LibraryButton({
-  onClick,
-  variant,
+export default function LibraryButtonWrapper({
   children,
+  variant,
+  onClick,
+  className,
 }: LibraryButtonProps) {
-  const styles = {
-    add: "bg-blue-600 hover:bg-blue-700",
-    remove: "bg-red-600 hover:bg-red-700",
-    edit: "bg-amber-600 hover:bg-amber-700",
-  }
+  const baseStyles = "px-4 py-2 rounded font-semibold transition-colors";
+  const variantStyles =
+    variant === "add" ? "bg-green-600 text-white hover:bg-green-700" : "bg-blue-600 text-white hover:bg-blue-700";
 
   return (
     <button
       onClick={onClick}
-      className={cn(
-        "px-4 py-2 text-white rounded-xl transition cursor-pointer",
-        styles[variant]
-      )}
+      className={`${baseStyles} ${variantStyles} ${className || ""}`}
     >
       {children}
     </button>
-  )
+  );
 }
