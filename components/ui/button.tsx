@@ -1,31 +1,36 @@
-import { cn } from "@/lib/utils"
+"use client";
 
-type LibraryButtonProps = {
-  onClick: () => void
-  variant: "add" | "remove" | "edit"
-  children: React.ReactNode
+import React, { ReactNode, ButtonHTMLAttributes } from "react";
+
+interface LibraryButtonWrapperProps
+  extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children: ReactNode;
+  variant?: "add" | "delete" | "default";
 }
 
-export default function LibraryButton({
-  onClick,
-  variant,
+export default function LibraryButtonWrapper({
   children,
-}: LibraryButtonProps) {
-  const styles = {
-    add: "bg-blue-600 hover:bg-blue-700",
-    remove: "bg-red-600 hover:bg-red-700",
-    edit: "bg-amber-600 hover:bg-amber-700",
-  }
+  variant = "default",
+  className,
+  ...props
+}: LibraryButtonWrapperProps) {
+  const baseStyles =
+    "px-4 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center gap-2 hover:shadow-md active:scale-95";
+
+  const variantStyles: Record<string, string> = {
+    add: "bg-green-600 text-white hover:bg-green-700",
+    delete: "bg-red-600 text-white hover:bg-red-700",
+    default: "bg-blue-600 text-white hover:bg-blue-700",
+  };
+
+  const selectedVariantStyle = variantStyles[variant] || variantStyles.default;
 
   return (
     <button
-      onClick={onClick}
-      className={cn(
-        "px-4 py-2 text-white rounded-xl transition cursor-pointer",
-        styles[variant]
-      )}
+      className={`${baseStyles} ${selectedVariantStyle} ${className || ""}`}
+      {...props}
     >
       {children}
     </button>
-  )
+  );
 }
