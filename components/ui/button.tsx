@@ -5,7 +5,7 @@ import React, { ReactNode, ButtonHTMLAttributes } from "react";
 interface LibraryButtonWrapperProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  variant?: "add" | "delete" | "default";
+  variant?: "add" | "delete" | "remove" | "default";
 }
 
 export default function LibraryButtonWrapper({
@@ -20,6 +20,7 @@ export default function LibraryButtonWrapper({
   const variantStyles: Record<string, string> = {
     add: "bg-green-600 text-white hover:bg-green-700",
     delete: "bg-red-600 text-white hover:bg-red-700",
+    remove: "bg-orange-600 text-white hover:bg-orange-700",
     default: "bg-blue-600 text-white hover:bg-blue-700",
   };
 
