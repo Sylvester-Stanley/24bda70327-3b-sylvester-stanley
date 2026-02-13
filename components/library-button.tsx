@@ -1,11 +1,22 @@
 "use client";
 
-import Button from "@/components/ui/button";
+import LibraryButtonWrapper from "@/components/ui/button";
+import { ReactNode, ButtonHTMLAttributes } from "react";
 
-export default function LibraryButton() {
+interface LibraryButtonProps
+  extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children: ReactNode;
+  variant?: "add" | "delete" | "default";
+}
+
+export default function LibraryButton({
+  children,
+  variant = "default",
+  ...props
+}: LibraryButtonProps) {
   return (
-    <Button>
-      Add to Library
-    </Button>
+    <LibraryButtonWrapper variant={variant} {...props}>
+      {children}
+    </LibraryButtonWrapper>
   );
 }
