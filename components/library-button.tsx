@@ -6,7 +6,7 @@ import { ReactNode, ButtonHTMLAttributes } from "react";
 interface LibraryButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  variant?: "add" | "delete" | "default";
+  variant?: "add" | "delete" | "remove" | "default";
 }
 
 export default function LibraryButton({
