@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import LibraryButton from "@/components/ui/button";  // ← Changed to default import
 import { ReactNode } from "react";
 
 type LibraryButtonProps = {
@@ -9,14 +9,14 @@ type LibraryButtonProps = {
   onClick?: () => void;
 };
 
-export default function LibraryButton({
+export default function LibraryButtonWrapper({
   children,
   variant,
   onClick,
 }: LibraryButtonProps) {
   return (
-    <Button onClick={onClick} className={variant === "add" ? "bg-green-600 text-white" : ""}>
+    <LibraryButton onClick={onClick} className={variant === "add" ? "bg-green-600 text-white" : ""}>
       {children}
-    </Button>
+    </LibraryButton>
   );
 }
